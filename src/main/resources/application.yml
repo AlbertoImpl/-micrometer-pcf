@@ -15,7 +15,6 @@ management:
         include: "*"
   endpoint:
     metrics:
-
       enabled: true
     hystrix:
       enabled: true
