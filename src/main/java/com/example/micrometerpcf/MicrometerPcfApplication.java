@@ -5,16 +5,18 @@ import java.util.List;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @EnableCircuitBreaker
+@EnableScheduling
 public class MicrometerPcfApplication {
 
 	public static void main(String[] args) {
@@ -22,10 +24,11 @@ public class MicrometerPcfApplication {
 	}
 
 	@RestController
-	class TestController {
+	static class TestController {
 
-		@Autowired
-		private DoSomething doSomething;
+		private final DoSomething doSomething;
+
+		public TestController(DoSomething doSomething) {this.doSomething = doSomething;}
 
 		@GetMapping("/greetings")
 		public String getGreetings() throws Exception {
@@ -35,10 +38,11 @@ public class MicrometerPcfApplication {
 	}
 
 	@Component
-	class DoSomething {
+	static class DoSomething {
 
 		@HystrixCommand(fallbackMethod = "defaultGreetings")
-		public List<String> greetings() throws Exception {
+		@Scheduled(fixedDelay = 5000)
+		List<String> greetings() throws Exception {
 			double random = Math.random();
 			if (random > 0.5) {
 				throw new RuntimeException();
