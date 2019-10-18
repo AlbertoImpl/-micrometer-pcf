@@ -1,0 +1,32 @@
+---
+apiVersion: indicatorprotocol.io/v1
+kind: IndicatorDocument
+
+metadata:
+  labels:
+    deployment: "custom app metrics"
+
+spec:
+  product:
+    #name: org,space,app
+    version: 0.0.1
+
+  indicators:
+    - name: "Hystrix concurrent executions"
+      promql: "sum(avg_over_time(hystrix_latency_total_seconds_max{source_id=\"$sourceId\"}[1m]))"
+      documentation:
+        title: "Hystrix concurrent executions"
+      presentation:
+        units: "none"
+    - name: "Hystrix executions"
+      promql: "sum(avg_over_time(hystrix_execution_total{source_id=\"$sourceId\"}[1m]))"
+      documentation:
+        title: "Hystrix executions"
+      presentation:
+        units: "none"
+    - name: "Hystrix 90th percentile latency, sum, rate by le"
+      promql: "histogram_quantile(0.9, sum(rate(hystrix_latency_total_seconds_bucket{source_id=\"$sourceId\"}[10m])) by (le))"
+      documentation:
+        title: "Hystrix 90th percentile latency - sum, rate, by le"
+      presentation:
+        units: "none"
